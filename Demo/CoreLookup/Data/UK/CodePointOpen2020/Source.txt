@@ -1,0 +1,13 @@
+﻿https://en.wikipedia.org/wiki/Postcodes_in_the_United_Kingdom#GB_postcodes_available_as_OpenData
+
+https://osdatahub.os.uk/downloads/open
+
+https://osdatahub.os.uk/downloads/open/CodePointOpen
+
+NOTE: Data uses Eastings and Northings: Resrouces to check for conversion to something useful:
+
+https://www.ordnancesurvey.co.uk/business-government/tools-support/os-net/for-developers (developer pack)
+
+https://stackoverflow.com/questions/2199308/convert-eastings-northings-to-latitude-longitude-using-nettopologysuite/16671414
+
+

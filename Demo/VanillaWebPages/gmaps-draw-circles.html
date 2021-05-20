@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+     * element that contains the map. */
+      #map {
+      height: 60%;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      color: white;
+      }
+  </style>
+
+    <!-- https://console.cloud.google.com/home/dashboard -->
+    <!-- Set Restrictions at https://console.cloud.google.com/apis/credentials --->
+
+    <!-- https://developers.google.com/maps/documentation/javascript/error-messages#referer-not-allowed-map-error
+        means add your current IP to the restrictions list.
+    -->
+
+    <!-- Remember to add javascript maps and geocode api's to your project in google console. -->
+
+    <title>Circles</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <!-- The KEY must be st in 2 places. Search SET_KEY_HERE -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=SET_KEY_HERE&callback=initMap&libraries=&v=weekly"
+      defer
+    ></script>
+
+    <script>
+        var key = "SET_KEY_HERE"; // Also set in src above and here.
+        var map;
+        var circle;
+
+        var centerLat;
+        var centerLng;
+        var radiusInMetres = 30000;
+        
+            
+        /* IMPORTANT: initMap is a callback in the googleapis script src above. */
+        function initMap() {
+          // Create the map.
+          map = new google.maps.Map(document.getElementById("map"), {
+              zoom: 6,
+              center: { lat: 51.84, lng: -0.80 },
+              mapTypeId: "terrain",
+              zoomControl: true,
+              scaleControl: false,
+              disableDefaultUI: true
+          });
+
+          // Area is wherever you want to attach the click, either a polygon, a map...
+          google.maps.event.addListener(map, "click", function(event) {
+                  addCircle(event.latLng.lat(), event.latLng.lng());
+          });
+
+          // Radius changing events are after the first circle has been created.
+        }
+
+        /* Stuff to run once the doc is loaded (not required for google maps, just textboxes) */
+        function docReady(){
+          // Allow re-setting the radius from the textbox after a circle has been entered.
+          var radiusInput = document.getElementById('radius');
+          radiusInput.addEventListener('input', function(e){
+              var radiusValue = parseInt(document.getElementById('radius').value);
+              if(radiusValue > 0)
+              {
+                radiusInMetres = radiusValue;
+                if(circle){
+                  circle.setRadius(radiusInMetres);
+                }
+              }
+          });
+        }
+        document.addEventListener('DOMContentLoaded', docReady, false);
+
+        /* Adds a circle to the map and sets events to listen out for changes to the circle */
+        function addCircle(lat, lng){
+          if(circle){
+            circle.setMap(null);
+          } 
+
+          centerLat = lat;
+          centerLng = lng;
+
+          var center = { lat: lat, lng:lng  };
+          
+          circle = new google.maps.Circle({
+                      strokeColor: "#000000",
+                      strokeOpacity: 0.8,
+                      strokeWeight: 1,
+                      fillColor: "#000000",
+                      fillOpacity: 0.35,
+                      map,
+                      editable: true,
+                      draggable: true,
+                      center: center,
+                      radius:  radiusInMetres,
+                      });
+          //map.setCenter(latLngObj);
+          setLatLngText();
+
+          // Listen out for changes to the circle
+          google.maps.event.addListener(circle, 'radius_changed', function (event) {
+              radiusInMetres = circle.radius;
+              document.getElementById('radius').value = radiusInMetres;
+              setLatLngText();
+          });
+
+          google.maps.event.addListener(circle, 'center_changed', function (event) {
+              radiusInMetres = circle.radius;
+              centerLat = circle.center.lat();
+              centerLng = circle.center.lng();
+              document.getElementById('radius').value = radiusInMetres;
+              setLatLngText();
+          });
+        }
+
+        /* Just updates the UI with the latest coordinates */
+        function setLatLngText(){
+          document.getElementById('lat').innerText = 'Lat: ' + centerLat;
+          document.getElementById('lng').innerText = 'Long: ' + centerLng;
+          document.getElementById('rad').innerText = 'Rad: ' + radiusInMetres;
+        }
+
+        /* Take the postcode, use google to look up it's coordinates,
+           then plot a circle using that as the center.
+        */
+        function addCircleButtonClick(){
+          var postcode = document.getElementById('postcode').value;
+          // Remember to add the geocode api to your project!
+          // https://developers.google.com/maps/documentation/geocoding/start?csw=1
+          postcode = postcode.replace(' ', '+')
+          var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + postcode + "&key=" + key;
+          httpGetAsync(url, googleGeocodeCallback)
+        }
+
+ 
+        /* Handle the result from the geocode lookup */
+        function googleGeocodeCallback(responseText){
+            var json = JSON.parse(responseText);
+            var latLong = json.results[0].geometry.location;
+            addCircle(latLong.lat, latLong.lng);
+        }
+
+        /* Just a standard http get (pure js) */
+        function httpGetAsync(theUrl, callback)
+        {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function() { 
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                    callback(xmlHttp.responseText);
+            }
+            xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+            xmlHttp.send(null);
+        }
+
+    </script>
+    
+
+
+
+  </head>
+
+  <body>
+
+    <div>
+      <label for="postcode">Postcode</label>
+      <input id="postcode" type="text" value="PO4 8RA" style="min-width: 100px;" />
+      <label for="radius">Radius (in meters)</label>
+      <input id="radius" type="number" value="30000" style="min-width: 100px;" />
+      <button onclick="addCircleButtonClick()">Go!</button>
+    </div>
+
+    <div id="map"></div>
+
+    <p id=lat></p>
+    <p id=lng></p>
+    <p id=rad></p>
+  </body>
+</html>

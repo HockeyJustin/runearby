@@ -1,0 +1,8 @@
+﻿World Postcodes: https://data.opendatasoft.com/explore/dataset/geonames-postal-code%40public-us/export/?sort=place_name
+
+This dataset -> Whole US: https://data.opendatasoft.com/explore/embed/dataset/geonames-postal-code@public-us/table/?sort=place_name&refine.country_code=US
+
+Smaller sample set for info....
+Rhode Island:  https://data.opendatasoft.com/explore/dataset/geonames-postal-code%40public-us/table/?sort=place_name&refine.country_code=US&refine.admin_name1=Rhode+Island
+
+Licence: https://creativecommons.org/licenses/by/4.0/
