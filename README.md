@@ -1,6 +1,6 @@
 # R U Nearby
 
-This project looks at handling postcode/ and location data, primarily UK focussed, but with some globally applicable methods.
+This project looks at handling postcode/ and location data. It has some globally applicable methods and some stuff relating to UK Postcodes.
 
 # Conventions
 
